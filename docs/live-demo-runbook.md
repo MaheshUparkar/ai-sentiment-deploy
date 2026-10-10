@@ -65,7 +65,7 @@ Both are Free instances from the same repo. Two free services for a few hours st
 |---|---|---|
 | Render ▸ **New ▸ Web Service** ▸ pick the repo | The repo list | "Render reads code straight from GitHub." |
 | Name `ai-sentiment-live`, Language **Docker**, Region **Singapore**, Instance **Free**, Advanced ▸ Health Check `/health` | The config form | "Language = Docker means: *don't guess, use our Dockerfile.* Free = 0.1 CPU, 512 MB." |
-| **Deploy Web Service** | Build logs streaming | Narrate: base image → `pip install` → `Saved model v1.0.0` → image pushed → `Loaded model` → `Uvicorn running on http://0.0.0.0:10000` |
+| **Deploy Web Service** | Build logs streaming | Narrate: base image → `pip install` → training prints test accuracy → `Saved model v2.0.0` → image pushed → `Loaded model` → `Uvicorn running on http://0.0.0.0:10000` |
 | Wait for **Live** → open the new URL | Same app on a new URL | "Same image, new container, new address. That's portability." |
 
 While waiting, talk through Section 7's *statelessness* and *cost* points to use the time.
@@ -85,7 +85,7 @@ While waiting, talk through Section 7's *statelessness* and *cost* points to use
 | Do | Audience sees | Say |
 |---|---|---|
 | Show QR slide (main URL) | Phones out | "Type something about your work." |
-| Try `Not bad at all` | Model says **negative** (~79%) — tested | "Small model, limited data. Deployment worked perfectly; the *model* is the weak link — that's why monitoring model quality matters." |
+| Try `Not bad at all` | Model says **negative** (~56%, low confidence) — tested | "Even trained on 34,000 sentences, a simple model trips on negation. Deployment worked perfectly; the *model* is the weak link — that's why monitoring model quality matters." |
 | Clear the text box → *Analyse* | "Please enter a sentence first." | "Input validation is part of production readiness." |
 | Render ▸ main service ▸ *Logs* | Their requests: `predict sentiment=positive confidence=0.87 chars=58` | "Basic observability — we log outcomes, not personal content." |
 | If Option 1 was used: do the Option 2 commit now on the main service | Footer changes to v1.1.0 | "Shipping a change is routine." |

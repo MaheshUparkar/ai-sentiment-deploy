@@ -15,15 +15,16 @@ A user types a sentence; a scikit-learn model running inside a container in the 
 
 | Layer | What it is here | File |
 |---|---|---|
-| Data | ~420 labelled sentences (120 hand-written + 300 template-generated) | [training/data/sentiment_data.csv](training/data/sentiment_data.csv) |
-| Training | TF-IDF (character n-grams) + Logistic Regression, saved with joblib | [training/train.py](training/train.py) |
-| Model artifact | `model/sentiment_model.joblib` (~50 KB) — created at **image build time** | — |
+| Data | ~34,400 labelled texts from two public datasets + 150 hand-written business sentences (see §8) | [training/data/](training/data/) |
+| Training | Word + character TF-IDF + VADER lexicon scores → Logistic Regression, saved with joblib | [training/train.py](training/train.py), [app/features.py](app/features.py) |
+| Model artifact | `model/sentiment_model.joblib` (~4 MB) — created at **image build time** | — |
 | Inference service | FastAPI: `GET /`, `GET /health`, `POST /predict`, auto docs at `/docs` | [app/main.py](app/main.py) |
 | UI | One static HTML page calling `/predict` | [app/static/index.html](app/static/index.html) |
 | Packaging | Dockerfile → image containing Python, libraries, code and trained model | [Dockerfile](Dockerfile) |
 | Hosting | Render free web service, builds from the Dockerfile on every Git push | [render.yaml](render.yaml) |
 
-Runtime footprint measured locally: **~130 MB RAM** after 20 predictions (free tier limit: 512 MB).
+Measured locally: **~185 MB RAM** at runtime (free tier limit: 512 MB), **~47 ms** per prediction, training
+**~25 s / ~520 MB peak** — training runs on Render's build machines (2 CPU / 8 GB), not on the 512 MB instance.
 
 ---
 
@@ -40,6 +41,7 @@ Runtime footprint measured locally: **~130 MB RAM** after 20 predictions (free t
 | Ephemeral filesystem — nothing written at runtime survives a restart | https://render.com/docs/free |
 | No SSH/shell, single instance only, may be restarted at any time | https://render.com/docs/free |
 | Exceeding bandwidth / build minutes **without a payment method** suspends the service — it does **not** bill you | https://render.com/docs/free |
+| Builds run on separate **2 CPU / 8 GB** machines; Hobby workspaces get **500 build minutes / month** | https://render.com/docs/build-pipeline |
 | ⚠️ If `plan` is omitted in `render.yaml`, Render uses the **paid** `0.5c-512mb` plan. This repo sets `plan: free` explicitly. | https://render.com/docs/blueprint-spec |
 
 **Not chosen:** Hugging Face Docker / CPU-Basic Spaces — per current HF docs they need a paid plan for personal accounts.
@@ -56,11 +58,16 @@ Runtime footprint measured locally: **~130 MB RAM** after 20 predictions (free t
 ai-sentiment-deploy/
 ├── app/
 │   ├── main.py              # FastAPI inference service
+│   ├── features.py          # VADER features (shared by training and serving)
 │   └── static/index.html    # Browser UI
 ├── training/
-│   ├── train.py             # Trains and saves the model
-│   └── data/sentiment_data.csv
-├── tests/test_app.py        # Health, prediction, validation, missing-model tests
+│   ├── prepare_data.py      # Downloads + normalises public datasets (already run; output committed)
+│   ├── train.py             # Trains, evaluates on held-out data, saves the model
+│   └── data/
+│       ├── public/          # tweets_{train,val,test}.csv, uci_sentences.csv
+│       ├── business_train.csv   # 150 hand-written business sentences
+│       └── business_eval.csv    # 60 held-out business sentences (never trained on)
+├── tests/test_app.py        # Health, prediction, validation, missing-model, quality tests
 ├── docs/                    # Session plan, runbook, troubleshooting, Q&A
 ├── Dockerfile
 ├── .dockerignore
@@ -79,8 +86,8 @@ Requires Python 3.12+.
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1          # macOS/Linux: source .venv/bin/activate
 pip install -r requirements-dev.txt
-python training/train.py               # creates model/sentiment_model.joblib
-pytest -q                              # 13 tests
+python training/train.py               # ~25 s; creates model/sentiment_model.joblib and prints test metrics
+pytest -q                              # 14 tests
 uvicorn app.main:app --port 8000       # open http://localhost:8000
 ```
 
@@ -108,8 +115,9 @@ docker logs <container-id>                                 # see application log
 | `ENV PYTHONUNBUFFERED=1 ...` | Logs appear immediately in `docker logs` / Render logs. |
 | `WORKDIR /app` | All later steps happen in `/app` inside the image. |
 | `COPY requirements.txt` + `RUN pip install` | Install libraries **before** copying code so this slow layer is cached when only code changes. |
-| `COPY training/ app/` | Put our code and data into the image. |
-| `RUN python training/train.py` | Train at build time → the model is **baked into the image**; every container has the identical model. |
+| `COPY app/features.py` + `COPY training/` | Copy only what training needs. |
+| `RUN python training/train.py` | Train at build time → the model is **baked into the image**; every container has the identical model. Cached unless data/training code changes. |
+| `COPY app/` | Copy the rest of the app **after** training, so a UI/API change doesn't retrain (fast redeploys). |
 | `useradd` + `USER appuser` | Don't run as root — basic container hygiene. |
 | `ENV PORT=8000` / `EXPOSE 8000` | Default port; Render overrides `PORT` at runtime (default 10000). |
 | `CMD ... uvicorn --host 0.0.0.0 --port ${PORT}` | Start the server on **all interfaces** so traffic from outside the container can reach it. |
@@ -152,7 +160,7 @@ docker logs <container-id>                                 # see application log
    | Advanced ▸ Auto-Deploy | On Commit |
 
 5. Click **Deploy Web Service**. Watch the logs: you'll see each Dockerfile step, then
-   `Loaded model v1.0.0` and `Uvicorn running on http://0.0.0.0:10000`.
+   `Saved model v2.0.0`, `Loaded model v2.0.0` and `Uvicorn running on http://0.0.0.0:10000`.
 6. When the status is **Live**, open the URL shown at the top of the page.
 
 **Alternative (Blueprint):** *New ▸ Blueprint* → select the repo → Render reads [render.yaml](render.yaml) → confirm
@@ -162,7 +170,7 @@ the plan shows **Free** → *Apply*.
 
 Open in a private/incognito window:
 
-- `https://<your-service>.onrender.com/` → UI loads, footer shows `App v1.0.0 · Model v1.0.0 · Container <id>`
+- `https://<your-service>.onrender.com/` → UI loads, footer shows `App v1.0.0 · Model v2.0.0 (71% test accuracy) · Container <id>`
 - `https://<your-service>.onrender.com/health` → `{"status":"ok", ...}`
 - `https://<your-service>.onrender.com/docs` → interactive API docs
 
@@ -185,7 +193,7 @@ Example response (actual local result):
 
 ```json
 {"text":"The new AI assistant has made our team's work much faster.","sentiment":"positive",
- "confidence":0.8726,"probabilities":{"negative":0.0822,"neutral":0.0451,"positive":0.8726},"model_version":"1.0.0"}
+ "confidence":0.6442,"probabilities":{"negative":0.1962,"neutral":0.1596,"positive":0.6442},"model_version":"2.0.0"}
 ```
 
 Invalid input (empty, whitespace, >1000 chars, wrong type) returns **HTTP 422** with a message.
@@ -202,8 +210,8 @@ Invalid input (empty, whitespace, >1000 chars, wrong type) returns **HTTP 422** 
 
 | # | Check | Command / action | Expected |
 |---|---|---|---|
-| 1 | Train | `python training/train.py` | `Saved model v1.0.0` |
-| 2 | Tests | `pytest -q` | `13 passed` |
+| 1 | Train | `python training/train.py` | `Saved model v2.0.0`, tweet-test accuracy ≈ 0.71 |
+| 2 | Tests | `pytest -q` | `14 passed` |
 | 3 | Local server | `uvicorn app.main:app` → `/health` | `status: ok` |
 | 4 | Predict | `POST /predict` | JSON with `sentiment`, `confidence` |
 | 5 | Validation | `POST /predict {"text":"  "}` | HTTP 422 |
@@ -215,14 +223,38 @@ Invalid input (empty, whitespace, >1000 chars, wrong type) returns **HTTP 422** 
 
 ---
 
-## 8. Model limitations (say this out loud)
+## 8. Model, data and limitations (say this out loud)
 
-- Trained on ~420 short business sentences, 300 of them generated from templates. Cross-validation accuracy
-  (~0.91) is optimistic because templated sentences share phrasing.
-- It does not understand sarcasm, negation ("not bad"), domain jargon or long documents.
+### Results on held-out data (never used for training)
+
+| Model | Tweet test set (5,205, 3-class) | Business eval set (60) |
+|---|---|---|
+| v1 — char TF-IDF on 420 mostly templated sentences | 0.444 | 0.817 |
+| VADER lexicon alone (no training) | 0.606 | 0.833 |
+| **v2 — word + char TF-IDF + VADER, public data** | **0.706** (macro-F1 0.708) | **0.900** |
+
+Settings were chosen on the separate validation split (`tweets_val.csv`); the test sets were scored once.
+The business eval set is small (60 sentences), so treat it as a sanity check, not a benchmark.
+
+### Data sources
+
+| Data | Rows | Labels | Licence |
+|---|---|---|---|
+| [Sp1786/multiclass-sentiment-analysis-dataset](https://huggingface.co/datasets/Sp1786/multiclass-sentiment-analysis-dataset) (tweets; pinned revision in `prepare_data.py`) | 31,232 train / 5,205 val / 5,205 test | pos / neg / neutral | Apache-2.0 as listed on Hugging Face. The texts appear to originate from Kaggle's *Tweet Sentiment Extraction* competition — check its terms before any commercial reuse. |
+| [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) — Kotzias et al., *From Group to Individual Labels using Deep Features*, KDD 2015 | 3,000 | pos / neg | CC BY 4.0 |
+| `business_train.csv` — hand-written for this demo (incl. 30 negation examples) | 150 | pos / neg / neutral | this repo |
+| [VADER](https://github.com/cjhutto/vaderSentiment) lexicon — Hutto & Gilbert, ICWSM 2014 | ~7,500 words | sentiment scores | MIT |
+
+The tweet data is informal social-media text and may contain profanity.
+
+### Limitations
+
+- About **7 in 10** predictions on unseen general text are right; neutral is the hardest class (F1 ≈ 0.64).
+- Sarcasm fools it ("Great, another outage." → positive). Bare negations are still shaky: "Not bad at all" →
+  negative with low confidence (~0.56), while "Not bad at all, the vendor delivered on time." → positive.
 - "Confidence" is the model's probability estimate, not a guarantee.
 - It exists to demonstrate **deployment**, not to be a production sentiment engine. A production system would
-  use a stronger model (e.g. a fine-tuned transformer or an LLM API), proper evaluation data, and monitoring.
+  use a stronger model (e.g. a fine-tuned transformer or an LLM API), domain-specific evaluation data, and monitoring.
 
 ---
 

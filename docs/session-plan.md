@@ -101,7 +101,7 @@
 
 Keep it to three files. Don't read code line by line — point at *responsibilities*.
 
-1. **[training/train.py](../training/train.py)** — "Learn from ~420 labelled sentences, save the result to one file." Training happens **once**, separately from serving.
+1. **[training/train.py](../training/train.py)** — "Learn from ~34,000 labelled public sentences, test on data it has never seen, save the result to one file." Training happens **once**, separately from serving. Point out the printed test accuracy (~71%) — *measuring* the model is part of shipping it.
 2. **[app/main.py](../app/main.py)** — "Load the model once at start-up; for each request: validate input → predict → return JSON." Point out:
    - `/health` reports whether the model loaded and which container answered (`served_by`).
    - Input validation: empty or overly long text is rejected (show this later in the UI).
@@ -119,9 +119,9 @@ Follow Step 3 in [live-demo-runbook.md](live-demo-runbook.md): **Option 1** crea
 
 **What to say while the build runs (it takes a few minutes)**
 - "Render is doing what a developer would do with `docker build`: download the base image, install libraries, copy our code, train the model, create the image."
-- Point at log lines as they appear: `FROM python:3.13-slim` → `pip install` → `Saved model v1.0.0` → `Loaded model` → `Uvicorn running on http://0.0.0.0:10000`.
+- Point at log lines as they appear: `FROM python:3.13-slim` → `pip install` → `Saved model v2.0.0` → `Loaded model` → `Uvicorn running on http://0.0.0.0:10000`.
 - "Render then starts a container from the image, checks `/health`, and only switches traffic when the health check passes — that's a **zero-downtime deploy**."
-- "We're on the free tier: 0.1 CPU and 512 MB RAM. Our app uses about 130 MB. That's the kind of sizing conversation you'll have with your teams."
+- "We're on the free tier: 0.1 CPU and 512 MB RAM. Our app uses about 185 MB. That's the kind of sizing conversation you'll have with your teams."
 
 ---
 
@@ -132,7 +132,9 @@ Follow Step 3 in [live-demo-runbook.md](live-demo-runbook.md): **Option 1** crea
   - "The new AI assistant has made our team's work much faster." → positive
   - "The service was horrible and slow" → negative
   - "The meeting is on Friday at 3 pm" → neutral
-  - "Not bad at all" → likely wrong → **teaching moment** on model limitations and evaluation.
+  - "Not bad at all" → negative with low confidence (~56%) → **teaching moment** on model limitations and evaluation.
+  - "Great, another outage. Just what we needed." → positive → sarcasm defeats word-based models.
+- **Model iteration story:** "Our first model was right only 44% of the time on real text. We swapped in public data and a sentiment lexicon — now ~71% — and shipped it with the *same* Dockerfile and the *same* deployment. The pipeline didn't change; only the model inside the box did."
 - Show an invalid request: clear the box and click *Analyse* → friendly error. "Validation is part of production readiness."
 - Show **Render ▸ Logs**: their requests appear as `predict sentiment=... confidence=...`. "This is basic observability."
 - **Redeploy** (if you used Option 1 in Section 5): edit `APP_VERSION` on GitHub → commit → Render rebuilds → footer changes to v1.1.0 and usually a new container id. "Shipping a change is now a routine, low-risk event — that's the real payoff."

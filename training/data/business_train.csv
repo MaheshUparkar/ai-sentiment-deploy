@@ -1,0 +1,151 @@
+﻿text,label
+"The new AI assistant has made our team's work much faster.",positive
+"I love how easy the new dashboard is to use.",positive
+"Customer satisfaction scores improved a lot this quarter.",positive
+"The onboarding process was smooth and well organised.",positive
+"Great job on the launch, the client was delighted.",positive
+"This tool saves me hours every single week.",positive
+"The support team resolved my issue quickly and politely.",positive
+"Our revenue grew strongly and the outlook is excellent.",positive
+"The training session was insightful and very practical.",positive
+"I am really happy with the quality of this product.",positive
+"The new process is efficient and reliable.",positive
+"Fantastic results from the pilot project.",positive
+"The team delivered ahead of schedule, well done.",positive
+"Employees are enthusiastic about the new initiative.",positive
+"The app is fast, intuitive and beautifully designed.",positive
+"Excellent service, I would definitely recommend it.",positive
+"The automation has reduced errors dramatically.",positive
+"Our partners praised the clarity of the proposal.",positive
+"This is the best release we have shipped so far.",positive
+"The meeting was productive and we agreed on clear next steps.",positive
+"I appreciate the quick turnaround on the report.",positive
+"The model predictions are accurate and helpful.",positive
+"Sales are up and the team morale is high.",positive
+"The new laptop is wonderful and works perfectly.",positive
+"Thank you, this solution is exactly what we needed.",positive
+"The chatbot answered every question correctly, impressive.",positive
+"Our clients are happy with the faster response times.",positive
+"The upgrade went smoothly without any downtime.",positive
+"I am excited about the opportunities this brings.",positive
+"Brilliant presentation, the board loved it.",positive
+"The deployment was a success and users are pleased.",positive
+"Productivity has improved significantly since the change.",positive
+"The vendor has been supportive and dependable.",positive
+"What a pleasant experience, everything just worked.",positive
+"The new policy is fair and well received by staff.",positive
+"Our cloud costs dropped and performance got better.",positive
+"I enjoyed working with this team, great collaboration.",positive
+"The insights from the analysis were valuable.",positive
+"The feature is useful and saves a lot of effort.",positive
+"Superb quality and great value for money.",positive
+"The service is slow and keeps crashing.",negative
+"I am disappointed with the quality of this product.",negative
+"The project is delayed again and costs are rising.",negative
+"Customer complaints have increased sharply this month.",negative
+"The new system is confusing and hard to use.",negative
+"Support never replied to my emails, terrible experience.",negative
+"Our revenue fell and the outlook is worrying.",negative
+"The meeting was a waste of time with no decisions.",negative
+"The app is buggy and frustrating.",negative
+"This tool makes my work slower, not faster.",negative
+"The vendor missed every deadline, very unreliable.",negative
+"The report was full of errors and had to be redone.",negative
+"Employees are unhappy about the sudden changes.",negative
+"The website went down during the launch, a disaster.",negative
+"I hate how complicated the approval process has become.",negative
+"The chatbot gave wrong answers and annoyed customers.",negative
+"The deployment failed and users could not log in.",negative
+"Costs are out of control and nobody is accountable.",negative
+"The training was boring and not useful at all.",negative
+"Poor communication caused a lot of confusion.",negative
+"The model predictions are inaccurate and misleading.",negative
+"Sales dropped and morale is very low.",negative
+"The laptop is slow and the battery is awful.",negative
+"Our biggest client cancelled the contract, bad news.",negative
+"The upgrade broke several important features.",negative
+"I am frustrated with the constant outages.",negative
+"The proposal was rejected because it was unclear.",negative
+"The new policy is unfair and badly communicated.",negative
+"The dashboard is cluttered and useless.",negative
+"Response times are terrible and customers are angry.",negative
+"The data quality is poor and unreliable.",negative
+"This release has too many problems to go live.",negative
+"I regret buying this, it was a waste of money.",negative
+"The team is overworked and burnt out.",negative
+"Security issues were found and nobody fixed them.",negative
+"The onboarding was chaotic and disorganised.",negative
+"The analysis missed the key point entirely.",negative
+"Performance got worse after the change.",negative
+"Horrible experience, I would not recommend it.",negative
+"The integration keeps failing with timeout errors.",negative
+"The meeting is scheduled for Monday at ten.",neutral
+"The report contains data from the last quarter.",neutral
+"Our office is located on the third floor.",neutral
+"The model was trained on a public dataset.",neutral
+"Please send the invoice to the finance team.",neutral
+"The application runs inside a Docker container.",neutral
+"The server is hosted in the Singapore region.",neutral
+"The workshop covers containers and deployment.",neutral
+"The team has twelve members across two locations.",neutral
+"The quarterly review happens in the first week of April.",neutral
+"The API accepts text input and returns a label.",neutral
+"The document has been shared with all participants.",neutral
+"We will discuss the budget in the next session.",neutral
+"The policy applies to all full time employees.",neutral
+"The dataset has three columns and two hundred rows.",neutral
+"The new version was released on Tuesday.",neutral
+"The project started in January.",neutral
+"The dashboard shows weekly sales by region.",neutral
+"The vendor provides cloud hosting services.",neutral
+"The laptop has sixteen gigabytes of memory.",neutral
+"The survey was sent to five hundred customers.",neutral
+"The contract will be reviewed by the legal team.",neutral
+"The service listens on port eight thousand.",neutral
+"The chatbot is available in English and Hindi.",neutral
+"The training session is ninety minutes long.",neutral
+"The code is stored in a GitHub repository.",neutral
+"The board meets once every quarter.",neutral
+"The file was uploaded to the shared drive.",neutral
+"The container image is built from a Dockerfile.",neutral
+"The agenda includes theory and a live demo.",neutral
+"The request is sent to the prediction endpoint.",neutral
+"The office will be closed on the public holiday.",neutral
+"The model returns a label and a score.",neutral
+"The team uses Python for data analysis.",neutral
+"The presentation has twenty slides.",neutral
+"The data is updated every night at midnight.",neutral
+"Our company has offices in Mumbai and Pune.",neutral
+"The minutes of the meeting were circulated by email.",neutral
+"The application was deployed to the cloud today.",neutral
+"The batch is called Advance Gen AI.",neutral
+"Not bad, the new tool works fine.","positive"
+"The results were not bad at all.","positive"
+"Honestly not too bad for a first release.","positive"
+"I don't hate the new layout, it's actually nice.","positive"
+"No complaints, the service was smooth.","positive"
+"Can't complain, the rollout went well.","positive"
+"I was not disappointed with the vendor.","positive"
+"The update didn't cause any problems.","positive"
+"Nothing went wrong during the migration.","positive"
+"Not a single bug reported after launch, great.","positive"
+"The meeting wasn't boring at all.","positive"
+"Not bad for a free tier.","positive"
+"The app is not good at all.","negative"
+"I am not happy with the support.","negative"
+"The report was not useful.","negative"
+"This is not what we asked for.","negative"
+"The training didn't help anyone.","negative"
+"Not impressed with the new dashboard.","negative"
+"The vendor is not reliable.","negative"
+"I don't like the new process.","negative"
+"It does not work as promised.","negative"
+"Never had such a poor experience.","negative"
+"The model is not accurate enough.","negative"
+"We are not satisfied with the outcome.","negative"
+"The update is not available yet.","neutral"
+"I don't know when the meeting starts.","neutral"
+"The report does not include last week's data.","neutral"
+"The office is not open on Sundays.","neutral"
+"This feature is not part of the current release.","neutral"
+"We have not received the invoice yet.","neutral"

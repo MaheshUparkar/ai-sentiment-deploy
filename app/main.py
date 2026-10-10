@@ -83,6 +83,7 @@ def health():
         "status": "ok" if model_artifact else "model_not_loaded",
         "model_loaded": model_artifact is not None,
         "model_version": model_artifact["version"] if model_artifact else None,
+        "model_metrics": model_artifact.get("metrics") if model_artifact else None,
         "app_version": APP_VERSION,
         # The container's hostname: shows the audience which container answered.
         "served_by": socket.gethostname(),

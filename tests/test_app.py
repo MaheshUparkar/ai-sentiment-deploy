@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app.main as main
+from training import train
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,6 +30,7 @@ def test_health_ok(client):
     assert body["status"] == "ok"
     assert body["model_loaded"] is True
     assert body["model_version"]
+    assert 0 < body["model_metrics"]["test_accuracy"] <= 1
 
 
 def test_index_serves_ui(client):
@@ -62,6 +64,14 @@ def test_predict_demo_sentences(client, text, expected):
 def test_predict_is_deterministic(client):
     payload = {"text": "Our deployment failed again"}
     assert client.post("/predict", json=payload).json() == client.post("/predict", json=payload).json()
+
+
+def test_quality_on_held_out_business_sentences(client):
+    texts, labels = train.load("business_eval.csv")
+    preds = [client.post("/predict", json={"text": t}).json()["sentiment"] for t in texts]
+    accuracy = sum(p == y for p, y in zip(preds, labels)) / len(labels)
+    # Regression guard: v2 scores 0.90; v1 scored 0.82.
+    assert accuracy >= 0.85
 
 
 @pytest.mark.parametrize("payload", [{"text": ""}, {"text": "   "}, {}, {"text": "x" * 1001}, {"text": 123}])

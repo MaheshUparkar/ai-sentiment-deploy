@@ -1,0 +1,61 @@
+text,label
+"The rollout went smoothly and the client thanked us.",positive
+"Honestly the new CRM is a joy to work with.",positive
+"Our NPS jumped twelve points after the redesign.",positive
+"Not bad at all, the vendor delivered on time.",positive
+"I'm impressed by how quickly the team adapted.",positive
+"The pilot exceeded every target we set.",positive
+"Kudos to finance for closing the books early!",positive
+"The workshop was genuinely useful for my team.",positive
+"Love the new expense app, so much simpler.",positive
+"Customer feedback on the chatbot has been overwhelmingly positive.",positive
+"We hit our quarterly goal two weeks early.",positive
+"The new hire is sharp and a great fit.",positive
+"Thanks for the quick fix, everything works now.",positive
+"The AI summaries save me an hour a day.",positive
+"Brilliant work on the investor deck.",positive
+"The migration was painless, well done everyone.",positive
+"Our partners are thrilled with the results.",positive
+"The new office is bright and comfortable.",positive
+"Great to see such strong engagement in the survey.",positive
+"The model's recommendations have boosted conversions nicely.",positive
+"The release was a mess and customers noticed.",negative
+"I can't believe the vendor missed the deadline again.",negative
+"The new portal is not user friendly at all.",negative
+"Our churn rate is climbing and nobody has a plan.",negative
+"The demo crashed in front of the client, embarrassing.",negative
+"This approval process is painfully slow.",negative
+"The forecast was wildly off and leadership is upset.",negative
+"I'm tired of chasing people for status updates.",negative
+"The chatbot keeps giving customers wrong answers.",negative
+"Budget cuts have hurt the team badly.",negative
+"The report was late and full of mistakes.",negative
+"Nobody is happy with the new seating plan.",negative
+"Support tickets are piling up and response times are awful.",negative
+"The integration failed again overnight.",negative
+"What a frustrating week, nothing went to plan.",negative
+"The training was a waste of everyone's time.",negative
+"We lost the deal because our pricing was confusing.",negative
+"The laptop overheats and the battery dies quickly.",negative
+"Morale has dropped since the reorganisation.",negative
+"The dashboard numbers don't match finance, which is worrying.",negative
+"The steering committee meets every second Thursday.",neutral
+"Please find the updated project plan attached.",neutral
+"The data warehouse is refreshed at 2 am daily.",neutral
+"Our team moved to the fourth floor last month.",neutral
+"The contract renewal is due in March.",neutral
+"The service is deployed in the Singapore region.",neutral
+"The survey closes on Friday.",neutral
+"The API returns results in JSON format.",neutral
+"The quarterly town hall will be held online.",neutral
+"The model was retrained using last month's data.",neutral
+"Invoices are processed by the shared services team.",neutral
+"The policy document is on the intranet.",neutral
+"We have two vendors shortlisted for the RFP.",neutral
+"The container image is about 400 megabytes.",neutral
+"The workshop agenda has four sections.",neutral
+"The app supports both Android and iOS.",neutral
+"The board will review the proposal next week.",neutral
+"The dataset contains customer reviews from 2024.",neutral
+"Lunch will be served in the cafeteria.",neutral
+"The meeting has been moved to 3 pm.",neutral

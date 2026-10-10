@@ -43,9 +43,9 @@
     </div>
 
     <p class="note">
-      This is a <strong>demonstration model</strong> trained on a few hundred example sentences.
-      The score is the model's own confidence, not a guarantee of correctness.
-      It will get things wrong &mdash; that is part of the lesson.
+      This is a <strong>demonstration model</strong> (TF-IDF + VADER + logistic regression) trained on ~34,000
+      public example sentences. It is right roughly 7 times out of 10 on unseen text.
+      The score is the model's own confidence, not a guarantee &mdash; it will get things wrong, and that is part of the lesson.
     </p>
   </div>
   <footer>
@@ -104,7 +104,8 @@
       const res = await fetch("/health");
       const h = await res.json();
       const info = res.ok ? h : h.detail;
-      $("meta").textContent = `App v${info.app_version} · Model v${info.model_version ?? "not loaded"} · Container ${info.served_by}`;
+      const acc = info.model_metrics ? ` (${Math.round(info.model_metrics.test_accuracy * 100)}% test accuracy)` : "";
+      $("meta").textContent = `App v${info.app_version} · Model v${info.model_version ?? "not loaded"}${acc} · Container ${info.served_by}`;
     } catch { $("meta").textContent = "Service status unavailable"; }
   }
 
