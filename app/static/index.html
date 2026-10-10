@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Sentiment Demo</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #1f2937; margin: 0; }
+    main { max-width: 640px; margin: 48px auto; padding: 0 20px; }
+    .card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    h1 { margin: 0 0 6px; font-size: 1.6rem; }
+    .sub { color: #6b7280; margin: 0 0 20px; }
+    textarea { width: 100%; box-sizing: border-box; min-height: 110px; padding: 12px; font-size: 1rem; border: 1px solid #d1d5db; border-radius: 8px; resize: vertical; }
+    button { margin-top: 12px; padding: 10px 22px; font-size: 1rem; border: 0; border-radius: 8px; background: #2563eb; color: #fff; cursor: pointer; }
+    button:disabled { background: #93c5fd; cursor: wait; }
+    #result { margin-top: 22px; display: none; }
+    .label { font-size: 1.4rem; font-weight: 600; text-transform: capitalize; }
+    .positive { color: #15803d; } .negative { color: #b91c1c; } .neutral { color: #4b5563; }
+    .bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: .95rem; }
+    .bar span:first-child { width: 72px; text-transform: capitalize; }
+    .track { flex: 1; background: #e5e7eb; border-radius: 4px; height: 10px; overflow: hidden; }
+    .fill { height: 100%; background: #2563eb; }
+    .error { color: #b91c1c; margin-top: 14px; }
+    .note { font-size: .85rem; color: #6b7280; margin-top: 20px; line-height: 1.45; }
+    footer { font-size: .8rem; color: #9ca3af; text-align: center; margin-top: 18px; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>AI Sentiment Demo</h1>
+    <p class="sub">Type a sentence. A small machine-learning model, running inside a container in the cloud, will classify its sentiment.</p>
+
+    <label for="text" class="sub">Your sentence</label>
+    <textarea id="text" maxlength="1000">The new AI assistant has made our team's work much faster.</textarea>
+    <button id="go">Analyse sentiment</button>
+    <div id="error" class="error" role="alert"></div>
+
+    <div id="result" aria-live="polite">
+      <div>Prediction: <span id="label" class="label"></span> <span id="conf"></span></div>
+      <div id="bars" style="margin-top:12px"></div>
+    </div>
+
+    <p class="note">
+      This is a <strong>demonstration model</strong> trained on a few hundred example sentences.
+      The score is the model's own confidence, not a guarantee of correctness.
+      It will get things wrong &mdash; that is part of the lesson.
+    </p>
+  </div>
+  <footer>
+    <span id="meta">Checking service&hellip;</span> &middot;
+    <a href="/docs">API docs</a> &middot; <a href="/health">Health</a>
+  </footer>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  async function analyse() {
+    $("error").textContent = "";
+    const text = $("text").value.trim();
+    if (!text) { $("error").textContent = "Please enter a sentence first."; return; }
+
+    $("go").disabled = true; $("go").textContent = "Analysing…";
+    try {
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const detail = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
+        throw new Error(detail || "Request failed");
+      }
+      render(data);
+    } catch (err) {
+      $("result").style.display = "none";
+      $("error").textContent = "Error: " + err.message;
+    } finally {
+      $("go").disabled = false; $("go").textContent = "Analyse sentiment";
+    }
+  }
+
+  function render(data) {
+    $("label").textContent = data.sentiment;
+    $("label").className = "label " + data.sentiment;
+    $("conf").textContent = "(" + Math.round(data.confidence * 100) + "% confidence)";
+    const bars = $("bars");
+    bars.replaceChildren();
+    for (const [label, p] of Object.entries(data.probabilities).sort((a, b) => b[1] - a[1])) {
+      const row = document.createElement("div"); row.className = "bar";
+      const name = document.createElement("span"); name.textContent = label;
+      const track = document.createElement("div"); track.className = "track";
+      const fill = document.createElement("div"); fill.className = "fill"; fill.style.width = (p * 100) + "%";
+      const pct = document.createElement("span"); pct.textContent = Math.round(p * 100) + "%";
+      track.appendChild(fill); row.append(name, track, pct); bars.appendChild(row);
+    }
+    $("result").style.display = "block";
+  }
+
+  async function loadMeta() {
+    try {
+      const res = await fetch("/health");
+      const h = await res.json();
+      const info = res.ok ? h : h.detail;
+      $("meta").textContent = `App v${info.app_version} · Model v${info.model_version ?? "not loaded"} · Container ${info.served_by}`;
+    } catch { $("meta").textContent = "Service status unavailable"; }
+  }
+
+  $("go").addEventListener("click", analyse);
+  $("text").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analyse(); });
+  loadMeta();
+</script>
+</body>
+</html>

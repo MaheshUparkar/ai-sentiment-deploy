@@ -1,0 +1,12 @@
+# Render Blueprint: one free, Docker-based web service built from this repo.
+services:
+  - type: web
+    name: ai-sentiment-demo
+    runtime: docker
+    # Must be explicit: if omitted, Render defaults to the PAID 0.5c-512mb plan.
+    plan: free
+    # Closest Render region to India. Cannot be changed after creation.
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
