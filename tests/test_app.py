@@ -71,7 +71,7 @@ def test_quality_on_held_out_business_sentences(client):
     preds = [client.post("/predict", json={"text": t}).json()["sentiment"] for t in texts]
     accuracy = sum(p == y for p, y in zip(preds, labels)) / len(labels)
     # Regression guard: v2 scores 0.90; v1 scored 0.82.
-    assert accuracy >= 0.85
+    assert accuracy >= 0.87
 
 
 @pytest.mark.parametrize("payload", [{"text": ""}, {"text": "   "}, {}, {"text": "x" * 1001}, {"text": 123}])
